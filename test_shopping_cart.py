@@ -1,9 +1,11 @@
 from shopping_cart import ShoppingCart
+from item_database import ItemDatabase
 import pytest 
-
+from unittest.mock import Mock
 
 @pytest.fixture
 def cart():
+    # all setup fot the fart here
     return ShoppingCart(5)
 
 def test_can_add_item_to_cart(cart):
@@ -23,10 +25,19 @@ def test_when_add_more_than_max_items_should_fail(cart):
 def test_can_get_total_price(cart):
     cart.add('apple')
     cart.add('orange')
+    item_database = ItemDatabase()
 
-    price_map = {
-        'apple': 1.0,
-        'orange':2.0
-    }
+    def mock_get_item(item: str):
+        if item in 'apple':
+            return 1.0
+        if item == 'orange':
+            return 2.0
+    # item_database.get = Mock(return_value=1.0)
+    # item_database.get = Mock(return_value=1.0)
+    item_database.get = Mock(side_effect=mock_get_item)
+    # price_map = {
+    #     'apple': 1.0,
+    #     'orange':2.0
+    # }
     
-    assert cart.get_total_price(price_map) == 3
+    assert cart.get_total_price(item_database) == 3
